@@ -1,11 +1,17 @@
-# Scripts for customizing Docker images for TIBCO BusinessWorks™ Container Edition 
-The TIBCO BusinessWorks™ Container Edition (BWCE) Docker image is a highly extensible Docker base image for running TIBCO BusinessWorks Container Edition applications. This image can be customized for supported third-party drivers, OSGi™ bundles, integration with application configuration management systems, application certificate management etc.
-
-TIBCO BusinessWorks Container Edition allows customers to build microservices with an API-first approach and deploy them to cloud-native platforms such as [Cloud Foundry™](http://pivotal.io/platform) and [Kubernetes](http://kubernetes.io/). By elegantly right-sizing TIBCO ActiveMatrix BusinessWorks™, it brings visual application development and integration capabilities to any enterprise platform as a service.
-
-To know more about TIBCO BusinessWorks Container Edition, visit [Documentation](https://docs.tibco.com/products/tibco-businessworks-container-edition-2-0-0)
-
+#Custom Scripts for TIBCO BusinessWorks™ Container Edition 
 These Docker scripts are subject to the license shared as part of the repository. Review the license before using or downloading these scripts.
+
+Based on the [TIBCO Scripts](https://github.com/TIBCOSoftware/bwce-docker) I try to understand and customize the BWCE Installation on Docker.
+For this I build an [Alpine](https://github.com/gliderlabs/docker-alpine) image with modified BWCE Installation and Deployment Scripts.
+Think this WILL NOT WORK productively, but may it helps to build own images.
+
+##History
+* 5.1.2017 Add modified Scripts
+	* based on Alpine with glibc
+	* more Linux style file structure
+	* BWCE Runtime runs in own user context under user tibco
+
+# Usage
 
 ##Prerequisite
   * Access to [TIBCO® eDelivery](https://edelivery.tibco.com)
@@ -35,13 +41,16 @@ You can customize the base Docker image for supported third-party drivers e.g. O
     * Navigate to the `<TIBCO-HOME>/bwce/palettes/<plugin-name>/<plugin-version>` directory and  zip the `lib` and `runtime` folders into `<plugin-name>.zip` file. Copy `<plugin-name>.zip` to `<Your-local-Docker-repo>/resources/addons/plugins` folder.
   * Copy any OSGi bundles required by the plug-in for example, driver bundle into `<Your-local-Docker-repo>/resources/addons/jars`
 
-Run [createDockerImage.sh](createBuildpack.sh) to create the TIBCO BusinessWorks™ Container Edition base Docker image.
-     
-##Test TIBCO BusinessWorks Container Edition Base Docker Image
-  * Navigate to the [examples/HTTP](/examples/HTTP) directory and update the base Docker image in [Dockerfile](/examples/HTTP/Dockerfile) to your TIBCO BusinessWorks™ Container Edition base Docker image.
-  * From the [examples/HTTP](/examples/HTTP) directory, build the TIBCO BusinessWorks™ Container Edition application: `docker build -t bwce-http-app .`
-  * Run the TIBCO BusinessWorks™ Container Edition application: `docker run -P -e MESSAGE='Welcome to BWCE 2.0 !!!' bwce-http-app`
-  * Find the port number mapped to 8080 using `docker ps` and send a request to `http://<DOCKER-HOST-IP>:<HOST-PORT>`. It should return 'Welcome to BWCE 2.0 !!!' message. In case of failure, inspect the logs.
+##Build Docker Base Image
+Run [createBaseImage.sh](/baseimage/createBaseImage.sh) to create the baseimage.
+This script will copy the bwce_cf.zip from your local file system and the ProfileTokenResolver.java from github to your image build dir.
+   
+##Build Docker Application Image  
+Run [createExampleHttpAppImage.sh ](/exampleHttpApp/createExampleHttpAppImage.sh ) to create the app image.
+    
+##Test Application Image
+Run [startExampleHttpContainer.sh ](/exampleHttpApp/startExampleHttpContainer.sh ) to create the app image.
+  * Find the port number mapped to 8080 using `docker ps` and send a request to `http://<DOCKER-HOST-IP>:<HOST-PORT>`.
 
 ##License
 These buildpack scripts are released under a [3-clause BSD-type](License.md) license.
